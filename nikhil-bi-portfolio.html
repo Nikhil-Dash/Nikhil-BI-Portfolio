@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nikhil — Business Intelligence Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2F1EA;
+    --paper-2:#EAE8DF;
+    --ink:#171A21;
+    --ink-soft:#565A63;
+    --navy:#1E2A44;
+    --navy-2:#293B5F;
+    --teal:#2F8F7E;
+    --teal-dim:#DCEAE6;
+    --amber:#D98A2B;
+    --amber-dim:#F4E3CB;
+    --grid:#D3D1C6;
+    --white:#FFFFFF;
+    --radius:2px;
+    --rail-w:56px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    line-height:1.55;
+    padding-left:var(--rail-w);
+  }
+  a{color:inherit;}
+  ::selection{background:var(--teal); color:var(--white);}
+  :focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+
+  h1,h2,h3,h4{font-family:'Space Grotesk', sans-serif; font-weight:600; letter-spacing:-0.01em;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--ink-soft);
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow .cell-ref{
+    background:var(--navy); color:var(--white);
+    padding:2px 6px; border-radius:2px; font-size:10px;
+  }
+
+  /* ---------- Left rail: cell-reference nav ---------- */
+  .rail{
+    position:fixed; left:0; top:0; bottom:0; width:var(--rail-w);
+    background:var(--navy);
+    display:flex; flex-direction:column; align-items:center;
+    padding:14px 0; z-index:100;
+  }
+  .rail-logo{
+    color:var(--white); font-family:'IBM Plex Mono',monospace; font-size:11px;
+    writing-mode:vertical-rl; text-orientation:mixed; letter-spacing:0.15em;
+    margin-bottom:24px; opacity:0.65;
+  }
+  .rail-nav{display:flex; flex-direction:column; gap:6px; flex:1;}
+  .rail-cell{
+    width:36px; height:36px; border-radius:2px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600;
+    color:rgba(255,255,255,0.55);
+    background:transparent; border:1px solid transparent;
+    cursor:pointer; transition:all .15s ease;
+  }
+  .rail-cell:hover{border-color:rgba(255,255,255,0.3); color:var(--white);}
+  .rail-cell.active{background:var(--teal); color:var(--white);}
+  .rail-foot{color:rgba(255,255,255,0.4); font-family:'IBM Plex Mono',monospace; font-size:9px; writing-mode:vertical-rl; text-orientation:mixed; margin-top:12px;}
+
+  /* ---------- Formula bar ---------- */
+  .formula-bar{
+    position:sticky; top:0; z-index:90;
+    display:flex; align-items:center; gap:0;
+    background:var(--white); border-bottom:1px solid var(--grid);
+    height:40px; padding:0 14px;
+  }
+  .name-box{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600;
+    color:var(--navy); border-right:1px solid var(--grid); padding-right:12px; margin-right:12px;
+    min-width:34px;
+  }
+  .fx{color:var(--ink-soft); font-family:'IBM Plex Mono', monospace; font-size:12px; margin-right:10px; font-style:italic;}
+  .fx-content{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink); white-space:nowrap; overflow:hidden;
+  }
+  .fx-content .cursor{display:inline-block; width:6px; height:13px; background:var(--teal); margin-left:1px; animation:blink 1s step-end infinite; vertical-align:-2px;}
+  @keyframes blink{50%{opacity:0;}}
+
+  section{padding:64px 32px; max-width:1040px;}
+  .grid-lines{background-image:linear-gradient(var(--grid) 1px, transparent 1px); background-size:100% 34px;}
+
+  /* ---------- Hero ---------- */
+  #home{padding-top:72px;}
+  .hero-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:48px; align-items:center;}
+  .hero h1{font-size:44px; line-height:1.08; margin:14px 0 16px;}
+  .hero h1 span{color:var(--teal);}
+  .hero p.lead{color:var(--ink-soft); font-size:16px; max-width:46ch; margin-bottom:26px;}
+  .role-tags{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:30px;}
+  .role-tag{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; padding:5px 10px;
+    background:var(--white); border:1px solid var(--grid); border-radius:2px; color:var(--ink-soft);
+  }
+  .cta-row{display:flex; gap:12px; flex-wrap:wrap;}
+  .btn{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600;
+    padding:11px 18px; border-radius:2px; border:1px solid var(--navy);
+    cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px;
+    transition:all .15s ease; background:transparent; color:var(--navy);
+  }
+  .btn.primary{background:var(--navy); color:var(--white);}
+  .btn.primary:hover{background:var(--teal); border-color:var(--teal);}
+  .btn:hover{background:var(--paper-2);}
+  .btn.primary:hover{background:var(--teal);}
+
+  /* mini bar chart, hero signature */
+  .mini-chart{
+    background:var(--white); border:1px solid var(--grid); border-radius:2px; padding:20px;
+  }
+  .mini-chart .chead{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px;}
+  .mini-chart .chead .mono{font-size:11px; color:var(--ink-soft);}
+  .bars{display:flex; align-items:flex-end; gap:10px; height:120px;}
+  .bars .bar{flex:1; background:var(--teal-dim); border-radius:2px 2px 0 0; position:relative; overflow:hidden;}
+  .bars .bar::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; background:var(--teal); height:0%;
+    animation:grow 1.1s cubic-bezier(.2,.8,.2,1) forwards; animation-delay:var(--d);
+    border-radius:2px 2px 0 0;
+  }
+  .bars .bar:nth-child(4n+1)::after{background:var(--amber);}
+  @keyframes grow{to{height:var(--h);}}
+  .kpi-row{display:flex; gap:22px; margin-top:16px; border-top:1px solid var(--grid); padding-top:14px;}
+  .kpi{font-family:'IBM Plex Mono', monospace;}
+  .kpi .num{font-size:20px; font-weight:600; color:var(--navy);}
+  .kpi .lbl{font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em;}
+
+  /* ---------- Section heads ---------- */
+  .sec-head{margin-bottom:30px;}
+  .sec-head h2{font-size:26px; margin-top:8px;}
+  .sec-head p{color:var(--ink-soft); max-width:60ch; margin-top:8px;}
+
+  /* ---------- Dashboards ---------- */
+  .dash-grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:18px;}
+  .dash-card{
+    background:var(--white); border:1px solid var(--grid); border-radius:2px; overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+  .dash-head{display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid var(--grid);}
+  .dash-head .tag{font-family:'IBM Plex Mono',monospace; font-size:10px; padding:3px 7px; border-radius:2px; background:var(--paper-2); color:var(--ink-soft);}
+  .dash-body{position:relative; aspect-ratio:16/10; background:repeating-linear-gradient(45deg, var(--paper-2), var(--paper-2) 10px, var(--paper) 10px, var(--paper) 20px); display:flex; align-items:center; justify-content:center; cursor:pointer;}
+  .dash-body img{width:100%; height:100%; object-fit:cover; display:block;}
+  .dash-empty{text-align:center; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; font-size:11px; padding:12px;}
+  .dash-empty svg{opacity:.5; margin-bottom:6px;}
+  .dash-foot{padding:12px 14px;}
+  .dash-foot .t{font-weight:600; font-size:14px;}
+  .dash-foot .d{color:var(--ink-soft); font-size:12.5px; margin-top:3px;}
+  .dash-remove{position:absolute; top:8px; right:8px; background:rgba(23,26,33,.7); color:#fff; border:none; border-radius:2px; font-size:11px; padding:4px 7px; cursor:pointer; font-family:'IBM Plex Mono',monospace;}
+
+  /* ---------- Projects ---------- */
+  .proj-toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;}
+  .proj-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;}
+  .proj-card{background:var(--white); border:1px solid var(--grid); border-radius:2px; display:flex; flex-direction:column; overflow:hidden;}
+  .proj-thumb{aspect-ratio:16/10; background:var(--paper-2); display:flex; align-items:center; justify-content:center;}
+  .proj-thumb img{width:100%; height:100%; object-fit:cover;}
+  .proj-thumb .ph{font-family:'IBM Plex Mono',monospace; font-size:24px; color:var(--ink-soft); opacity:.4;}
+  .proj-body{padding:14px; flex:1; display:flex; flex-direction:column;}
+  .proj-body h4{font-size:15px; margin-bottom:6px;}
+  .proj-body p{color:var(--ink-soft); font-size:12.5px; flex:1;}
+  .proj-tags{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0;}
+  .proj-tags span{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--teal); background:var(--teal-dim); padding:2px 7px; border-radius:2px;}
+  .proj-links{display:flex; justify-content:space-between; align-items:center; margin-top:4px;}
+  .proj-links a{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--navy); text-decoration:underline;}
+  .proj-del{background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:11px; font-family:'IBM Plex Mono',monospace;}
+  .proj-card.add-card{border-style:dashed; align-items:center; justify-content:center; display:flex; cursor:pointer; min-height:220px; color:var(--ink-soft); flex-direction:column; gap:8px;}
+  .proj-card.add-card:hover{border-color:var(--teal); color:var(--teal); background:var(--teal-dim);}
+  .proj-card.add-card .plus{font-size:26px; font-family:'IBM Plex Mono',monospace;}
+  .empty-note{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); grid-column:1/-1; text-align:center; padding:30px 0;}
+
+  /* ---------- Skills (pivot table look) ---------- */
+  .pivot{width:100%; border-collapse:collapse; background:var(--white); border:1px solid var(--grid);}
+  .pivot th, .pivot td{border:1px solid var(--grid); padding:10px 14px; text-align:left; font-size:13px;}
+  .pivot th{background:var(--navy); color:var(--white); font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:.06em;}
+  .pivot td.cat{font-weight:600; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--navy); background:var(--paper-2);}
+  .lvl{display:flex; gap:3px;}
+  .lvl i{width:16px; height:8px; background:var(--grid); display:inline-block; border-radius:1px;}
+  .lvl i.on{background:var(--teal);}
+
+  /* ---------- Experience ---------- */
+  .timeline{border-left:2px solid var(--grid); padding-left:22px; display:flex; flex-direction:column; gap:26px;}
+  .tl-item{position:relative;}
+  .tl-item::before{content:''; position:absolute; left:-28px; top:4px; width:10px; height:10px; border-radius:50%; background:var(--teal); border:2px solid var(--paper);}
+  .tl-item .role{font-weight:600; font-size:15px;}
+  .tl-item .meta{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); margin:2px 0 8px;}
+  .tl-item p{color:var(--ink-soft); font-size:13px; max-width:62ch;}
+
+  /* ---------- Contact ---------- */
+  .contact-card{background:var(--navy); color:var(--white); border-radius:2px; padding:34px; display:grid; grid-template-columns:1fr 1fr; gap:28px;}
+  .contact-card h2{color:var(--white);}
+  .contact-card .sub{color:rgba(255,255,255,.65); margin-top:8px; max-width:42ch; font-size:13.5px;}
+  .cfield{display:flex; flex-direction:column; gap:4px; margin-bottom:14px;}
+  .cfield label{font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:rgba(255,255,255,.55);}
+  .cfield input{
+    background:var(--navy-2); border:1px solid rgba(255,255,255,.2); color:var(--white);
+    padding:9px 10px; border-radius:2px; font-family:'IBM Plex Sans',sans-serif; font-size:13px;
+  }
+  .cfield input::placeholder{color:rgba(255,255,255,.35);}
+  .contact-display{display:flex; flex-direction:column; gap:10px; justify-content:center;}
+  .contact-display a, .contact-display span{font-family:'IBM Plex Mono',monospace; font-size:13px;}
+  .save-note{font-size:11px; color:rgba(255,255,255,.5); margin-top:4px; font-family:'IBM Plex Mono',monospace;}
+
+  footer{padding:24px 32px 60px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);}
+
+  /* reveal animation */
+  .reveal{opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease;}
+  .reveal.in{opacity:1; transform:none;}
+
+  /* modal */
+  .modal-backdrop{position:fixed; inset:0; background:rgba(23,26,33,.55); display:none; align-items:center; justify-content:center; z-index:200; padding:20px;}
+  .modal-backdrop.open{display:flex;}
+  .modal{background:var(--white); border-radius:3px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; padding:26px;}
+  .modal h3{margin-bottom:16px;}
+  .field{display:flex; flex-direction:column; gap:5px; margin-bottom:14px;}
+  .field label{font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft);}
+  .field input, .field textarea{
+    border:1px solid var(--grid); border-radius:2px; padding:9px 10px; font-family:'IBM Plex Sans',sans-serif; font-size:13px; background:var(--paper);
+  }
+  .field textarea{resize:vertical; min-height:64px;}
+  .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:6px;}
+  .status-msg{font-family:'IBM Plex Mono',monospace; font-size:11px; margin-top:8px; min-height:14px;}
+  .status-msg.err{color:#B3452C;}
+  .status-msg.ok{color:var(--teal);}
+
+  @media (max-width:860px){
+    .hero-grid{grid-template-columns:1fr;}
+    .dash-grid{grid-template-columns:1fr;}
+    .proj-grid{grid-template-columns:1fr 1fr;}
+    .contact-card{grid-template-columns:1fr;}
+  }
+  @media (max-width:560px){
+    .proj-grid{grid-template-columns:1fr;}
+    .hero h1{font-size:32px;}
+    section{padding:44px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="rail">
+  <div class="rail-logo">NIKHIL.BI</div>
+  <div class="rail-nav">
+    <div class="rail-cell" data-target="home" title="Home">A1</div>
+    <div class="rail-cell" data-target="dashboards" title="Dashboards">B1</div>
+    <div class="rail-cell" data-target="projects" title="Projects">C1</div>
+    <div class="rail-cell" data-target="skills" title="Skills">D1</div>
+    <div class="rail-cell" data-target="experience" title="Experience">E1</div>
+    <div class="rail-cell" data-target="contact" title="Contact">F1</div>
+  </div>
+  <div class="rail-foot">SHEET 1</div>
+</nav>
+
+<div class="formula-bar">
+  <div class="name-box" id="nameBox">A1</div>
+  <div class="fx">fx</div>
+  <div class="fx-content" id="fxContent"></div>
+</div>
+
+<section id="home" class="reveal">
+  <div class="hero-grid">
+    <div class="hero">
+      <div class="eyebrow"><span class="cell-ref">A1</span> HOME</div>
+      <h1>Turning raw data into<br><span>decisions people act on.</span></h1>
+      <p class="lead">I'm Nikhil, a Business Intelligence professional with ~4 years of experience building dashboards, data models and reporting systems that banking and enterprise teams actually rely on.</p>
+      <div class="role-tags">
+        <span class="role-tag">Power BI</span>
+        <span class="role-tag">Tableau</span>
+        <span class="role-tag">SQL</span>
+        <span class="role-tag">DAX</span>
+        <span class="role-tag">Advanced Excel</span>
+        <span class="role-tag">VBA</span>
+        <span class="role-tag">Python / AI-ML</span>
+      </div>
+      <div class="cta-row">
+        <a href="#dashboards" class="btn primary">View dashboards</a>
+        <a href="#projects" class="btn">Browse projects</a>
+      </div>
+    </div>
+    <div class="mini-chart">
+      <div class="chead">
+        <span class="mono">QUARTERLY INSIGHT OUTPUT</span>
+        <span class="mono">FY26</span>
+      </div>
+      <div class="bars" id="heroBars"></div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="num">4+</div><div class="lbl">Yrs Experience</div></div>
+        <div class="kpi"><div class="num">4</div><div class="lbl">BI Tools</div></div>
+        <div class="kpi"><div class="num">1</div><div class="lbl">PG Data Science</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="dashboards" class="reveal">
+  <div class="sec-head">
+    <div class="eyebrow"><span class="cell-ref">B1</span> DASHBOARDS</div>
+    <h2>Reports built across the BI stack</h2>
+    <p>Click any tile to upload a screenshot of a dashboard you've built. Images are saved to your browser so they'll still be here next time.</p>
+  </div>
+  <div class="dash-grid" id="dashGrid"></div>
+</section>
+
+<section id="projects" class="reveal">
+  <div class="proj-toolbar">
+    <div class="sec-head" style="margin-bottom:0;">
+      <div class="eyebrow"><span class="cell-ref">C1</span> PROJECTS</div>
+      <h2>Selected work</h2>
+    </div>
+    <button class="btn primary" id="addProjectBtn">+ Add project</button>
+  </div>
+  <div class="proj-grid" id="projGrid"></div>
+</section>
+
+<section id="skills" class="reveal">
+  <div class="sec-head">
+    <div class="eyebrow"><span class="cell-ref">D1</span> SKILLS</div>
+    <h2>Toolkit, pivoted</h2>
+  </div>
+  <table class="pivot">
+    <thead><tr><th>Category</th><th>Tools</th><th>Proficiency</th></tr></thead>
+    <tbody>
+      <tr><td class="cat">Visualization</td><td>Power BI, Tableau</td><td><div class="lvl"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div></td></tr>
+      <tr><td class="cat">Data / Query</td><td>SQL, DAX</td><td><div class="lvl"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div></td></tr>
+      <tr><td class="cat">Spreadsheets</td><td>Advanced Excel, VBA Macros</td><td><div class="lvl"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div></td></tr>
+      <tr><td class="cat">Programming</td><td>Python, AI/ML basics</td><td><div class="lvl"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div></td></tr>
+      <tr><td class="cat">Systems</td><td>SAP CRM, Meta & Google Ads platforms</td><td><div class="lvl"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="experience" class="reveal">
+  <div class="sec-head">
+    <div class="eyebrow"><span class="cell-ref">E1</span> EXPERIENCE</div>
+    <h2>Where the work happened</h2>
+  </div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="role">Business Intelligence Professional</div>
+      <div class="meta mono">Banking analytics &amp; enterprise BI · ~4 years</div>
+      <p>Owned the Power BI ecosystem end-to-end — data modelling, DAX measures, and dashboard delivery for banking and enterprise stakeholders.</p>
+    </div>
+    <div class="tl-item">
+      <div class="role">CRM &amp; Ad Platform Analytics</div>
+      <div class="meta mono">SAP CRM · Meta Ads · Google Ads</div>
+      <p>Worked across SAP-based CRM systems and ad platforms to connect marketing performance data with business reporting.</p>
+    </div>
+    <div class="tl-item">
+      <div class="role">PG Program, Data Science</div>
+      <div class="meta mono">Meritshot · 2023 – 2024</div>
+      <p>Built a foundation in Python, machine learning and analytics to extend BI work into predictive territory.</p>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="reveal">
+  <div class="sec-head">
+    <div class="eyebrow"><span class="cell-ref">F1</span> CONTACT</div>
+    <h2>Get in touch</h2>
+  </div>
+  <div class="contact-card">
+    <div>
+      <h2 style="font-size:20px;">Let's talk data.</h2>
+      <p class="sub">Open to Business Intelligence and Analytics roles. Fill in your details once and they'll show on the card to the right — and stay saved for next time.</p>
+      <div class="cfield"><label>Email</label><input id="cEmail" type="email" placeholder="you@example.com"></div>
+      <div class="cfield"><label>LinkedIn</label><input id="cLinkedin" type="text" placeholder="linkedin.com/in/yourname"></div>
+      <div class="cfield"><label>Phone</label><input id="cPhone" type="text" placeholder="+91 ..."></div>
+      <button class="btn primary" id="saveContactBtn" style="border-color:var(--white);">Save details</button>
+      <div class="status-msg" id="contactStatus"></div>
+    </div>
+    <div class="contact-display" id="contactDisplay">
+      <span class="mono" style="opacity:.6;">Your saved details will appear here</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="mono">© 2026 · Built with SHEET1 layout · Chennai, India</div>
+</footer>
+
+<!-- Project modal -->
+<div class="modal-backdrop" id="projModalBackdrop">
+  <div class="modal">
+    <h3>Add a project</h3>
+    <div class="field"><label>Title</label><input id="pTitle" type="text" placeholder="e.g. Customer Churn Dashboard"></div>
+    <div class="field"><label>Description</label><textarea id="pDesc" placeholder="What it does, tools used, impact..."></textarea></div>
+    <div class="field"><label>Tags (comma separated)</label><input id="pTags" type="text" placeholder="Power BI, DAX, SQL"></div>
+    <div class="field"><label>Link (optional)</label><input id="pLink" type="text" placeholder="https://..."></div>
+    <div class="field"><label>Screenshot (optional)</label><input id="pImage" type="file" accept="image/*"></div>
+    <div class="status-msg" id="projStatus"></div>
+    <div class="modal-actions">
+      <button class="btn" id="cancelProjBtn">Cancel</button>
+      <button class="btn primary" id="saveProjBtn">Save project</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="dashFileInput" accept="image/*" style="display:none;">
+
+<script>
+(function(){
+  // ---------- storage helpers ----------
+  async function storeGet(key){
+    try{
+      const r = await window.storage.get(key, false);
+      return r ? JSON.parse(r.value) : null;
+    }catch(e){ return null; }
+  }
+  async function storeSet(key, val){
+    try{
+      await window.storage.set(key, JSON.stringify(val), false);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function resizeImage(file, maxW){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const scale = Math.min(1, maxW / img.width);
+          const w = Math.round(img.width * scale);
+          const h = Math.round(img.height * scale);
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---------- hero bars ----------
+  const heroBars = document.getElementById('heroBars');
+  const heights = [40,65,50,85,60,95,70,55];
+  heights.forEach((h,i) => {
+    const b = document.createElement('div');
+    b.className = 'bar';
+    b.style.setProperty('--h', h + '%');
+    b.style.setProperty('--d', (i*0.07)+'s');
+    heroBars.appendChild(b);
+  });
+
+  // ---------- formula bar typing ----------
+  const fxLines = {
+    home: '=INTRODUCE("Nikhil","BI Professional",4,"years")',
+    dashboards: '=SHOWCASE(PowerBI, Tableau, Excel, "Python/AI-ML")',
+    projects: '=FILTER(Projects, Status="Shipped")',
+    skills: '=PIVOT(Skills, ByCategory)',
+    experience: '=SORT(Experience, [Recent First])',
+    contact: '=HYPERLINK(Email, "Let\\'s talk")'
+  };
+  const fxEl = document.getElementById('fxContent');
+  const nameBoxEl = document.getElementById('nameBox');
+  let typingTimer = null;
+  function typeFormula(text){
+    if(typingTimer) clearInterval(typingTimer);
+    fxEl.innerHTML = '';
+    let i = 0;
+    const span = document.createElement('span');
+    fxEl.appendChild(span);
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    fxEl.appendChild(cursor);
+    typingTimer = setInterval(() => {
+      span.textContent = text.slice(0, i);
+      i++;
+      if(i > text.length) clearInterval(typingTimer);
+    }, 18);
+  }
+  typeFormula(fxLines.home);
+
+  // ---------- nav / scroll spy ----------
+  const cells = document.querySelectorAll('.rail-cell');
+  const sections = ['home','dashboards','projects','skills','experience','contact'].map(id => document.getElementById(id));
+  cells.forEach(c => c.addEventListener('click', () => {
+    document.getElementById(c.dataset.target).scrollIntoView({behavior:'smooth'});
+  }));
+  const cellRefMap = {home:'A1', dashboards:'B1', projects:'C1', skills:'D1', experience:'E1', contact:'F1'};
+  const spyObserver = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if(en.isIntersecting){
+        const id = en.target.id;
+        cells.forEach(c => c.classList.toggle('active', c.dataset.target === id));
+        nameBoxEl.textContent = cellRefMap[id];
+        typeFormula(fxLines[id]);
+      }
+    });
+  }, {threshold:0.4});
+  sections.forEach(s => spyObserver.observe(s));
+
+  // ---------- reveal on scroll ----------
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(en => { if(en.isIntersecting) en.target.classList.add('in'); });
+  }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // ---------- dashboards ----------
+  const DASH_DEFS = [
+    {id:'powerbi', tag:'Power BI', title:'Power BI Dashboard', desc:'Interactive reporting built with data models & DAX measures.'},
+    {id:'tableau', tag:'Tableau', title:'Tableau Dashboard', desc:'Visual analytics and storytelling for stakeholders.'},
+    {id:'excel', tag:'Excel', title:'Excel Dashboard', desc:'Advanced Excel workbook with formulas, pivots & VBA macros.'},
+    {id:'python', tag:'Python / AI-ML', title:'Python & AI-ML Project', desc:'Predictive analysis or automation built with Python.'},
+  ];
+  let dashData = {};
+  const dashGrid = document.getElementById('dashGrid');
+  let activeDashId = null;
+
+  function emptyStateSVG(){
+    return '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+  }
+
+  function renderDashboards(){
+    dashGrid.innerHTML = '';
+    DASH_DEFS.forEach(def => {
+      const saved = dashData[def.id] || {};
+      const card = document.createElement('div');
+      card.className = 'dash-card';
+      card.innerHTML = `
+        <div class="dash-head">
+          <span class="mono" style="font-size:12px; font-weight:600;">${saved.title || def.title}</span>
+          <span class="tag">${def.tag}</span>
+        </div>
+        <div class="dash-body" data-id="${def.id}">
+          ${saved.img
+            ? `<img src="${saved.img}" alt="${def.title}"><button class="dash-remove" data-remove="${def.id}">Remove</button>`
+            : `<div class="dash-empty">${emptyStateSVG()}<div>Click to upload screenshot</div></div>`}
+        </div>
+        <div class="dash-foot">
+          <div class="t">${saved.title || def.title}</div>
+          <div class="d">${saved.desc || def.desc}</div>
+        </div>`;
+      dashGrid.appendChild(card);
+    });
+  }
+
+  dashGrid.addEventListener('click', (e) => {
+    const removeId = e.target.dataset.remove;
+    if(removeId){
+      e.stopPropagation();
+      delete dashData[removeId];
+      storeSet('dashboards', dashData);
+      renderDashboards();
+      return;
+    }
+    const body = e.target.closest('.dash-body');
+    if(body){
+      activeDashId = body.dataset.id;
+      document.getElementById('dashFileInput').click();
+    }
+  });
+
+  document.getElementById('dashFileInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if(!file || !activeDashId) return;
+    try{
+      const dataUrl = await resizeImage(file, 1100);
+      dashData[activeDashId] = Object.assign({}, dashData[activeDashId], {img:dataUrl});
+      await storeSet('dashboards', dashData);
+      renderDashboards();
+    }catch(err){ console.error(err); }
+    e.target.value = '';
+  });
+
+  // ---------- projects ----------
+  let projects = [];
+  const projGrid = document.getElementById('projGrid');
+
+  function renderProjects(){
+    projGrid.innerHTML = '';
+    if(projects.length === 0){
+      const note = document.createElement('div');
+      note.className = 'empty-note';
+      note.textContent = 'No projects yet — click "Add project" to add your first one.';
+      projGrid.appendChild(note);
+    } else {
+      projects.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'proj-card';
+        card.innerHTML = `
+          <div class="proj-thumb">${p.img ? `<img src="${p.img}" alt="${p.title}">` : `<span class="ph">${(p.title||'?').charAt(0).toUpperCase()}</span>`}</div>
+          <div class="proj-body">
+            <h4>${p.title}</h4>
+            <p>${p.desc || ''}</p>
+            <div class="proj-tags">${(p.tags||[]).map(t => `<span>${t}</span>`).join('')}</div>
+            <div class="proj-links">
+              ${p.link ? `<a href="${p.link}" target="_blank" rel="noopener">View →</a>` : '<span></span>'}
+              <button class="proj-del" data-del="${p.id}">Remove</button>
+            </div>
+          </div>`;
+        projGrid.appendChild(card);
+      });
+    }
+    const addCard = document.createElement('div');
+    addCard.className = 'proj-card add-card';
+    addCard.id = 'addProjectInlineBtn';
+    addCard.innerHTML = '<div class="plus">+</div><div class="mono" style="font-size:12px;">Add project</div>';
+    projGrid.appendChild(addCard);
+    addCard.addEventListener('click', openProjModal);
+  }
+
+  projGrid.addEventListener('click', (e) => {
+    const delId = e.target.dataset.del;
+    if(delId){
+      projects = projects.filter(p => p.id !== delId);
+      storeSet('projects', projects);
+      renderProjects();
+    }
+  });
+
+  const projBackdrop = document.getElementById('projModalBackdrop');
+  function openProjModal(){
+    document.getElementById('pTitle').value = '';
+    document.getElementById('pDesc').value = '';
+    document.getElementById('pTags').value = '';
+    document.getElementById('pLink').value = '';
+    document.getElementById('pImage').value = '';
+    document.getElementById('projStatus').textContent = '';
+    projBackdrop.classList.add('open');
+  }
+  document.getElementById('addProjectBtn').addEventListener('click', openProjModal);
+  document.getElementById('cancelProjBtn').addEventListener('click', () => projBackdrop.classList.remove('open'));
+  projBackdrop.addEventListener('click', (e) => { if(e.target === projBackdrop) projBackdrop.classList.remove('open'); });
+
+  document.getElementById('saveProjBtn').addEventListener('click', async () => {
+    const title = document.getElementById('pTitle').value.trim();
+    const statusEl = document.getElementById('projStatus');
+    if(!title){
+      statusEl.textContent = 'Please add a title.';
+      statusEl.className = 'status-msg err';
+      return;
+    }
+    const desc = document.getElementById('pDesc').value.trim();
+    const tags = document.getElementById('pTags').value.split(',').map(t => t.trim()).filter(Boolean);
+    const link = document.getElementById('pLink').value.trim();
+    const file = document.getElementById('pImage').files[0];
+    let img = null;
+    statusEl.textContent = 'Saving...';
+    statusEl.className = 'status-msg';
+    try{
+      if(file){ img = await resizeImage(file, 900); }
+      const proj = {id: 'p_' + Date.now(), title, desc, tags, link, img};
+      projects.push(proj);
+      const ok = await storeSet('projects', projects);
+      if(!ok){
+        statusEl.textContent = 'Could not save — please try again.';
+        statusEl.className = 'status-msg err';
+        return;
+      }
+      renderProjects();
+      projBackdrop.classList.remove('open');
+    }catch(err){
+      statusEl.textContent = 'Something went wrong saving this project.';
+      statusEl.className = 'status-msg err';
+    }
+  });
+
+  // ---------- contact ----------
+  const contactDisplay = document.getElementById('contactDisplay');
+  function renderContactDisplay(c){
+    if(!c || (!c.email && !c.linkedin && !c.phone)){
+      contactDisplay.innerHTML = '<span class="mono" style="opacity:.6;">Your saved details will appear here</span>';
+      return;
+    }
+    contactDisplay.innerHTML = `
+      ${c.email ? `<a href="mailto:${c.email}">✉ ${c.email}</a>` : ''}
+      ${c.linkedin ? `<a href="https://${c.linkedin.replace(/^https?:\/\//,'')}" target="_blank" rel="noopener">in ${c.linkedin}</a>` : ''}
+      ${c.phone ? `<span>☎ ${c.phone}</span>` : ''}
+    `;
+  }
+  document.getElementById('saveContactBtn').addEventListener('click', async () => {
+    const c = {
+      email: document.getElementById('cEmail').value.trim(),
+      linkedin: document.getElementById('cLinkedin').value.trim(),
+      phone: document.getElementById('cPhone').value.trim(),
+    };
+    const statusEl = document.getElementById('contactStatus');
+    const ok = await storeSet('contact', c);
+    statusEl.textContent = ok ? 'Saved.' : 'Could not save — please try again.';
+    statusEl.className = ok ? 'status-msg ok' : 'status-msg err';
+    renderContactDisplay(c);
+  });
+
+  // ---------- init ----------
+  (async function init(){
+    const savedDash = await storeGet('dashboards');
+    dashData = savedDash || {};
+    renderDashboards();
+
+    const savedProj = await storeGet('projects');
+    projects = savedProj || [];
+    renderProjects();
+
+    const savedContact = await storeGet('contact');
+    if(savedContact){
+      document.getElementById('cEmail').value = savedContact.email || '';
+      document.getElementById('cLinkedin').value = savedContact.linkedin || '';
+      document.getElementById('cPhone').value = savedContact.phone || '';
+      renderContactDisplay(savedContact);
+    }
+  })();
+})();
+</script>
+</body>
+</html>
